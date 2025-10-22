@@ -2,10 +2,10 @@ spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/softfact
     username: postgres
-    password: postgres
+    password: sqllabs
   jpa:
     hibernate:
-      ddl-auto: validate   # deixe o Flyway cuidar do DDL
+      ddl-auto: none
     properties:
       hibernate:
         format_sql: true

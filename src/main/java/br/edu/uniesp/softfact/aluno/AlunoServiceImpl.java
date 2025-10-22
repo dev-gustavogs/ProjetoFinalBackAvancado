@@ -1,9 +1,11 @@
-// src/main/java/br/edu/uniesp/softfact/aluno/AlunoServiceImpl.java
 package br.edu.uniesp.softfact.aluno;
 
-import br.edu.uniesp.softfact.aluno.dto.*;
+import br.edu.uniesp.softfact.aluno.dto.AlunoCreateDTO;
+import br.edu.uniesp.softfact.aluno.dto.AlunoResponseDTO;
+import br.edu.uniesp.softfact.aluno.dto.AlunoUpdateDTO;
 import br.edu.uniesp.softfact.stack.StackTecnologia;
 import br.edu.uniesp.softfact.stack.StackTecRepository;
+import br.edu.uniesp.softfact.stack.dto.StackResumo;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -102,17 +104,17 @@ public class AlunoServiceImpl implements AlunoService {
         if (repo.existsByMatricula(matricula)) throw new DataIntegrityViolationException("Matrícula já cadastrada.");
     }
 
-    private Aluno toEntity(Aluno a, Set<Long> stacksIds) {
-        a.setStacks(buscarStacks(stacksIds));
-        return a;
-    }
-
     private Set<StackTecnologia> buscarStacks(Set<Long> ids) {
         if (ids == null || ids.isEmpty()) return Set.of();
         return ids.stream()
                 .map(id -> stackRepo.findById(id)
                         .orElseThrow(() -> new EntityNotFoundException("Stack não encontrada: " + id)))
                 .collect(Collectors.toSet());
+    }
+
+    private Aluno toEntity(Aluno a, Set<Long> stacksIds) {
+        a.setStacks(buscarStacks(stacksIds));
+        return a;
     }
 
     private AlunoResponseDTO toResponse(Aluno a) {

@@ -2,6 +2,7 @@ package br.edu.uniesp.softfact.aluno.dto;
 
 import br.edu.uniesp.softfact.aluno.enums.Curso;
 import br.edu.uniesp.softfact.aluno.enums.Periodo;
+import br.edu.uniesp.softfact.stack.dto.StackResumo;
 
 import java.util.Set;
 

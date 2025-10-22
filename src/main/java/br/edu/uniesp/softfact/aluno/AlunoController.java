@@ -1,17 +1,17 @@
 package br.edu.uniesp.softfact.aluno;
 
-import br.edu.uniesp.softfact.aluno.dto.*;
+import br.edu.uniesp.softfact.aluno.dto.AlunoCreateDTO;
+import br.edu.uniesp.softfact.aluno.dto.AlunoResponseDTO;
+import br.edu.uniesp.softfact.aluno.dto.AlunoUpdateDTO;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/alunos")
 @RequiredArgsConstructor
-@Validated
 public class AlunoController {
 
     private final AlunoService service;
