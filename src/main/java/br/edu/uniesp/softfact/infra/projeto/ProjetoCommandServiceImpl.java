@@ -1,8 +1,11 @@
 package br.edu.uniesp.softfact.infra.projeto;
 
+import br.edu.uniesp.softfact.application.aluno.VincularAlunoRequest;
 import br.edu.uniesp.softfact.application.stack.VincularStackRequest;
 import br.edu.uniesp.softfact.domain.projeto.Projeto;
 import br.edu.uniesp.softfact.domain.projeto.ProjetoCommandService;
+import br.edu.uniesp.softfact.infra.aluno.AlunoEntity;
+import br.edu.uniesp.softfact.infra.aluno.AlunoRepository;
 import br.edu.uniesp.softfact.infra.mapper.ProjetoEntityMapper;
 import br.edu.uniesp.softfact.zo.old.stack.StackTecRepository;
 import br.edu.uniesp.softfact.zo.old.stack.StackTecnologia;
@@ -16,6 +19,7 @@ public class ProjetoCommandServiceImpl implements ProjetoCommandService {
 
     private final ProjetoRepository repository;
     private final StackTecRepository stackRepository;
+    private final AlunoRepository alunoRepository;
 
     @Override
     public Projeto save(Projeto projeto) {
@@ -59,6 +63,40 @@ public class ProjetoCommandServiceImpl implements ProjetoCommandService {
         }
 
         projeto.getStacks().remove(stack);
+        return repository.save(projeto);
+    }
+
+    @Override
+    @Transactional
+    public ProjetoEntity vincularAluno(Long projetoId, VincularAlunoRequest request) {
+        ProjetoEntity projeto = repository.findById(projetoId)
+                .orElseThrow(() -> new IllegalArgumentException("Projeto não encontrado"));
+
+        AlunoEntity aluno = alunoRepository.findById(request.getAlunoId())
+                .orElseThrow(() -> new IllegalArgumentException("Aluno não encontrado"));
+
+        if (projeto.getAlunos().contains(aluno)) {
+            throw new IllegalArgumentException("Aluno já vinculado a este projeto");
+        }
+
+        projeto.getAlunos().add(aluno);
+        return repository.save(projeto);
+    }
+
+    @Override
+    @Transactional
+    public ProjetoEntity desvincularAluno(Long projetoId, VincularAlunoRequest request) {
+        ProjetoEntity projeto = repository.findById(projetoId)
+                .orElseThrow(() -> new IllegalArgumentException("Projeto não encontrado"));
+
+        AlunoEntity aluno = alunoRepository.findById(request.getAlunoId())
+                .orElseThrow(() -> new IllegalArgumentException("Aluno não encontrado"));
+
+        if (!projeto.getAlunos().contains(aluno)) {
+            throw new IllegalArgumentException("Aluno não está vinculado a este projeto");
+        }
+
+        projeto.getAlunos().remove(aluno);
         return repository.save(projeto);
     }
 }

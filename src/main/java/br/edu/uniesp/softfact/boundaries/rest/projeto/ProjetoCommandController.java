@@ -1,5 +1,6 @@
 package br.edu.uniesp.softfact.boundaries.rest.projeto;
 
+import br.edu.uniesp.softfact.application.aluno.VincularAlunoRequest;
 import br.edu.uniesp.softfact.application.projeto.*;
 import br.edu.uniesp.softfact.application.stack.VincularStackRequest;
 import br.edu.uniesp.softfact.domain.projeto.Projeto;
@@ -88,6 +89,30 @@ public class ProjetoCommandController {
             @Valid @RequestBody VincularStackRequest request) {
         try {
             ProjetoEntity projeto = commandService.desvincularStack(projetoId, request);
+            return ResponseEntity.ok(projeto);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @PostMapping("/{projetoId}/alunos")
+    public ResponseEntity<ProjetoEntity> vincularAluno(
+            @PathVariable Long projetoId,
+            @Valid @RequestBody VincularAlunoRequest request) {
+        try {
+            ProjetoEntity projeto = commandService.vincularAluno(projetoId, request);
+            return ResponseEntity.ok(projeto);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @DeleteMapping("/{projetoId}/alunos")
+    public ResponseEntity<ProjetoEntity> desvincularAluno(
+            @PathVariable Long projetoId,
+            @Valid @RequestBody VincularAlunoRequest request) {
+        try {
+            ProjetoEntity projeto = commandService.desvincularAluno(projetoId, request);
             return ResponseEntity.ok(projeto);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().build();

@@ -36,11 +36,11 @@ public class ProjetoEntity {
     @Column(name = "id_professor")
     private Long idProfessor;
 
-    ///@ManyToMany
-    ///@JoinTable(name = "tb_softfact_projeto_aluno",
-    ///        joinColumns = @JoinColumn(name = "projeto_id"),
-    ///        inverseJoinColumns = @JoinColumn(name = "aluno_id"))
-    ///private Set<AlunoEntity> alunos = new HashSet<>();
+    @ManyToMany
+    @JoinTable(name = "tb_softfact_projeto_aluno",
+            joinColumns = @JoinColumn(name = "projeto_id"),
+            inverseJoinColumns = @JoinColumn(name = "aluno_id"))
+    private Set<AlunoEntity> alunos = new HashSet<>();
 
     @ManyToMany
     @JoinTable(name = "tb_softfact_projeto_stack",
