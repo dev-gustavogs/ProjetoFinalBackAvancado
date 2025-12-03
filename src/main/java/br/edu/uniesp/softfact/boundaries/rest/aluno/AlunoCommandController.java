@@ -5,9 +5,11 @@ import br.edu.uniesp.softfact.application.aluno.AlunoResponse;
 import br.edu.uniesp.softfact.application.aluno.AlunoUpdateRequest;
 import br.edu.uniesp.softfact.application.mappers.AlunoCreateMapper;
 import br.edu.uniesp.softfact.application.mappers.AlunoUpdateMapper;
+import br.edu.uniesp.softfact.application.stack.VincularStackRequest;
 import br.edu.uniesp.softfact.domain.aluno.UpdateAlunoService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -40,5 +42,29 @@ public class AlunoCommandController {
     @DeleteMapping("/{id}")
     public void excluir(@PathVariable Long id) {
         service.excluir(id);
+    }
+
+    @PostMapping("/{alunoId}/stacks")
+    public ResponseEntity<AlunoResponse> vincularStack(
+            @PathVariable Long alunoId,
+            @Valid @RequestBody VincularStackRequest request) {
+        try {
+            AlunoResponse aluno = service.vincularStack(alunoId, request);
+            return ResponseEntity.ok(aluno);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @DeleteMapping("/{alunoId}/stacks")
+    public ResponseEntity<AlunoResponse> desvincularStack(
+            @PathVariable Long alunoId,
+            @Valid @RequestBody VincularStackRequest request) {
+        try {
+            AlunoResponse aluno = service.desvincularStack(alunoId, request);
+            return ResponseEntity.ok(aluno);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 }

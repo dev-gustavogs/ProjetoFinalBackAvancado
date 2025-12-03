@@ -1,9 +1,11 @@
 package br.edu.uniesp.softfact.infra.aluno;
 
 import br.edu.uniesp.softfact.application.aluno.AlunoResponse;
+import br.edu.uniesp.softfact.application.stack.VincularStackRequest;
 import br.edu.uniesp.softfact.domain.aluno.Aluno;
 import br.edu.uniesp.softfact.domain.aluno.UpdateAlunoService;
 import br.edu.uniesp.softfact.infra.mapper.AlunoEntityMapper;
+import br.edu.uniesp.softfact.infra.stack.StackEntity;
 import br.edu.uniesp.softfact.zo.old.stack.StackTecRepository;
 import br.edu.uniesp.softfact.zo.old.stack.StackTecnologia;
 import jakarta.persistence.EntityNotFoundException;
@@ -67,5 +69,38 @@ public class UpdateAlunoServiceImpl implements UpdateAlunoService {
                 .map(id -> stackRepo.findById(id)
                         .orElseThrow(() -> new EntityNotFoundException("Stack não encontrada: " + id)))
                 .collect(Collectors.toSet());
+    }
+    @Override
+    @Transactional
+    public AlunoResponse vincularStack(Long alunoId, VincularStackRequest request) {
+        AlunoEntity aluno = repo.findById(alunoId)
+                .orElseThrow(() -> new IllegalArgumentException("Aluno não encontrado"));
+
+        StackTecnologia stack = stackRepo.findById(request.getStackId())
+                .orElseThrow(() -> new IllegalArgumentException("Stack não encontrada"));
+
+        if (aluno.getStacks().contains(stack)) {
+            throw new IllegalArgumentException("Stack já vinculada a este aluno");
+        }
+
+        aluno.getStacks().add(stack);
+        return entityMapper.toResponse(aluno);
+    }
+
+    @Override
+    @Transactional
+    public AlunoResponse desvincularStack(Long alunoId, VincularStackRequest request) {
+        AlunoEntity aluno = repo.findById(alunoId)
+                .orElseThrow(() -> new IllegalArgumentException("Aluno não encontrado"));
+
+        StackTecnologia stack = stackRepo.findById(request.getStackId())
+                .orElseThrow(() -> new IllegalArgumentException("Stack não encontrada"));
+
+        if (!aluno.getStacks().contains(stack)) {
+            throw new IllegalArgumentException("Stack não está vinculada a este aluno");
+        }
+
+        aluno.getStacks().remove(stack);
+        return entityMapper.toResponse(aluno);
     }
 }
