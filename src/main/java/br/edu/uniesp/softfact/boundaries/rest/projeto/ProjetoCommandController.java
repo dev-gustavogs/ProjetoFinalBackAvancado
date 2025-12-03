@@ -1,9 +1,13 @@
 package br.edu.uniesp.softfact.boundaries.rest.projeto;
 
 import br.edu.uniesp.softfact.application.projeto.*;
+import br.edu.uniesp.softfact.application.stack.VincularStackRequest;
 import br.edu.uniesp.softfact.domain.projeto.Projeto;
 import br.edu.uniesp.softfact.domain.projeto.ProjetoCommandService;
+import br.edu.uniesp.softfact.infra.projeto.ProjetoEntity;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -65,5 +69,28 @@ public class ProjetoCommandController {
                 .status(updated.getStatus())
                 .idProfessor(updated.getIdProfessor())
                 .build();
+    }
+    @PostMapping("/{projetoId}/stacks")
+    public ResponseEntity<ProjetoEntity> vincularStack(
+            @PathVariable Long projetoId,
+            @Valid @RequestBody VincularStackRequest request) {
+        try {
+            ProjetoEntity projeto = commandService.vincularStack(projetoId, request);
+            return ResponseEntity.ok(projeto);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @DeleteMapping("/{projetoId}/stacks")
+    public ResponseEntity<ProjetoEntity> desvincularStack(
+            @PathVariable Long projetoId,
+            @Valid @RequestBody VincularStackRequest request) {
+        try {
+            ProjetoEntity projeto = commandService.desvincularStack(projetoId, request);
+            return ResponseEntity.ok(projeto);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 }

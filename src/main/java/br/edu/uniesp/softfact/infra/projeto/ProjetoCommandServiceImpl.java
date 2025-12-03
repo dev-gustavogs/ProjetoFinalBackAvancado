@@ -1,10 +1,12 @@
 package br.edu.uniesp.softfact.infra.projeto;
 
-import br.edu.uniesp.softfact.application.projeto.ProjetoCreateRequest;
-import br.edu.uniesp.softfact.application.projeto.ProjetoUpdateRequest;
+import br.edu.uniesp.softfact.application.stack.VincularStackRequest;
 import br.edu.uniesp.softfact.domain.projeto.Projeto;
 import br.edu.uniesp.softfact.domain.projeto.ProjetoCommandService;
 import br.edu.uniesp.softfact.infra.mapper.ProjetoEntityMapper;
+import br.edu.uniesp.softfact.zo.old.stack.StackTecRepository;
+import br.edu.uniesp.softfact.zo.old.stack.StackTecnologia;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -13,6 +15,7 @@ import org.springframework.stereotype.Service;
 public class ProjetoCommandServiceImpl implements ProjetoCommandService {
 
     private final ProjetoRepository repository;
+    private final StackTecRepository stackRepository;
 
     @Override
     public Projeto save(Projeto projeto) {
@@ -24,5 +27,38 @@ public class ProjetoCommandServiceImpl implements ProjetoCommandService {
     public Projeto update(Projeto projeto) {
        var entity = ProjetoEntityMapper.toEntity(projeto);
         return ProjetoEntityMapper.toDomain(repository.save(entity));
+    }
+    @Override
+    @Transactional
+    public ProjetoEntity vincularStack(Long projetoId, VincularStackRequest request) {
+        ProjetoEntity projeto = repository.findById(projetoId)
+                .orElseThrow(() -> new IllegalArgumentException("Projeto não encontrado"));
+
+        StackTecnologia stack = stackRepository.findById(request.getStackId())
+                .orElseThrow(() -> new IllegalArgumentException("Stack não encontrada"));
+
+        if (projeto.getStacks().contains(stack)) {
+            throw new IllegalArgumentException("Stack já vinculada a este projeto");
+        }
+
+        projeto.getStacks().add(stack);
+        return repository.save(projeto);
+    }
+
+    @Override
+    @Transactional
+    public ProjetoEntity desvincularStack(Long projetoId, VincularStackRequest request) {
+        ProjetoEntity projeto = repository.findById(projetoId)
+                .orElseThrow(() -> new IllegalArgumentException("Projeto não encontrado"));
+
+        StackTecnologia stack = stackRepository.findById(request.getStackId())
+                .orElseThrow(() -> new IllegalArgumentException("Stack não encontrada"));
+
+        if (!projeto.getStacks().contains(stack)) {
+            throw new IllegalArgumentException("Stack não está vinculada a este projeto");
+        }
+
+        projeto.getStacks().remove(stack);
+        return repository.save(projeto);
     }
 }
